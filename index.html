@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Process Scheduling Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold text-center mb-8">Process Scheduling Simulator</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h2 class="text-xl font-semibold mb-4">Add Processes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <input type="number" name="arrival_time" placeholder="Arrival Time" class="p-2 border rounded" min="0">
+        <input type="number" name="burst_time" placeholder="Burst Time" class="p-2 border rounded" min="1">
+        <input type="number" name="priority" placeholder="Priority" class="p-2 border rounded" min="0" value="0">
+        <button type="button" onclick="addProcess()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+          Add Process
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-2">Algorithm:</label>
+        <select id="algorithm" class="p-2 border rounded w-full mb-2">
+          <option value="FCFS">First Come First Serve (FCFS)</option>
+          <option value="SJF">Shortest Job First (SJF)</option>
+          <option value="Priority">Priority Scheduling</option>
+          <option value="RR">Round Robin (RR)</option>
+        </select>
+        <input type="number" id="quantum" placeholder="Time Quantum (for RR)" class="p-2 border rounded w-full" min="1" value="2" disabled>
+      </div>
+
+      <button onclick="runSimulation()" class="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded font-medium">
+        Run Simulation
+      </button>
+    </div>
+
+    <div id="processList" class="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h2 class="text-xl font-semibold mb-4">Process Queue</h2>
+      <div id="processItems" class="space-y-2"></div>
+    </div>
+
+    <div id="result" class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-4">Simulation Results</h2>
+      <div id="resultContent" class="overflow-auto"></div>
+    </div>
+  </div>
+
+  <script>
+    let processes = [];
+    let nextPid = 1;
+
+    // Toggle quantum field visibility
+    document.getElementById('algorithm').addEventListener('change', function() {
+      const quantumField = document.getElementById('quantum');
+      quantumField.disabled = this.value !== 'RR';
+    });
+
+    function addProcess() {
+      const arrival = document.querySelector('[name="arrival_time"]').value;
+      const burst = document.querySelector('[name="burst_time"]').value;
+      const priority = document.querySelector('[name="priority"]').value || 0;
+
+      if (!arrival || !burst) {
+        alert('Please enter arrival and burst time');
+        return;
+      }
+
+      const process = {
+        pid: nextPid++,
+        arrival_time: parseInt(arrival),
+        burst_time: parseInt(burst),
+        priority: parseInt(priority)
+      };
+
+      processes.push(process);
+      updateProcessList();
+      
+      // Clear input fields
+      document.querySelector('[name="arrival_time"]').value = '';
+      document.querySelector('[name="burst_time"]').value = '';
+      document.querySelector('[name="priority"]').value = '0';
+    }
+
+    function updateProcessList() {
+      const container = document.getElementById('processItems');
+      container.innerHTML = processes.length === 0 
+        ? '<p class="text-gray-500">No processes added yet</p>'
+        : processes.map(p => `
+            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+              <span>PID: ${p.pid} | Arrival: ${p.arrival_time} | Burst: ${p.burst_time} | Priority: ${p.priority}</span>
+              <button onclick="removeProcess(${p.pid})" class="text-red-500 hover:text-red-700">
+                ×
+              </button>
+            </div>
+          `).join('');
+    }
+
+    function removeProcess(pid) {
+      processes = processes.filter(p => p.pid !== pid);
+      updateProcessList();
+    }
+
+    async function runSimulation() {
+      if (processes.length === 0) {
+        alert('Please add at least one process');
+        return;
+      }
+
+      const algorithm = document.getElementById('algorithm').value;
+      const quantum = parseInt(document.getElementById('quantum').value) || 0;
+
+      if (algorithm === 'RR' && quantum <= 0) {
+        alert('Please enter a valid time quantum for Round Robin');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            algorithm: algorithm,
+            processes: processes,
+            quantum: quantum
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Request failed');
+        }
+
+        const data = await response.json();
+        displayResults(data);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    function displayResults(data) {
+      const container = document.getElementById('resultContent');
+      
+      if (data.error) {
+        container.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+        return;
+      }
+
+      // Create a table for results
+      let html = `
+        <div class="mb-4">
+          <p class="font-medium">Algorithm: <span class="font-normal">${data.algorithm}</span></p>
+          ${data.algorithm === 'RR' ? `<p class="font-medium">Quantum: <span class="font-normal">${data.quantum || 'N/A'}</span></p>` : ''}
+        </div>
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="p-2 border">PID</th>
+              <th class="p-2 border">Arrival</th>
+              <th class="p-2 border">Burst</th>
+              <th class="p-2 border">Priority</th>
+              <th class="p-2 border">Start Time</th>
+              <th class="p-2 border">Completion Time</th>
+              <th class="p-2 border">Turnaround Time</th>
+              <th class="p-2 border">Waiting Time</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.results.forEach(p => {
+        const turnaround = p.completion_time - p.arrival_time;
+        const waiting = turnaround - p.burst_time;
+        
+        html += `
+          <tr>
+            <td class="p-2 border">${p.pid}</td>
+            <td class="p-2 border">${p.arrival_time}</td>
+            <td class="p-2 border">${p.burst_time}</td>
+            <td class="p-2 border">${p.priority}</td>
+            <td class="p-2 border">${p.start_time}</td>
+            <td class="p-2 border">${p.completion_time}</td>
+            <td class="p-2 border">${turnaround}</td>
+            <td class="p-2 border">${waiting}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
