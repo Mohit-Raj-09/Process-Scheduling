@@ -1,168 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Process Scheduling Simulator</title>
-    <link rel="stylesheet" href="home-style.css">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="home-style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="main">
+      <div id="top">
+        <h1>Process Scheduling Simulator</h1>
+        <p class="subtitle">
+          Visualize and understand process scheduling algorithms with our
+          <br />interactive simulator.
+        </p>
+      </div>
 
-</head>
-<body>
-    <div id = "main">
-        <div id="top">
-            <h1>Process Scheduling Simulator</h1>
-            <p class="subtitle">Visualize and understand process scheduling algorithms with our <br>interactive simulator.</p>
+      <div class="add-process">
+        <h2>Add Process</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="arrival-time">Arrival Time </label>
+            <input
+              class="input-box"
+              type="number"
+              id="arrival-time"
+              placeholder="Enter arrival time "
+              min="0"
+              max="100"
+            />
+          </div>
+          <div class="form-group">
+            <label for="burst-time">Burst Time </label>
+            <input
+              class="input-box"
+              type="number"
+              id="burst-time"
+              placeholder="Enter burst time"
+              min="0"
+              max="100"
+            />
+          </div>
+          <div class="form-group">
+            <label for="priority">Priority</label>
+            <input
+              class="input-box"
+              type="number"
+              id="priority"
+              placeholder="Enter priority"
+              min="0"
+              max="100"
+            />
+          </div>
         </div>
 
-        
-        <div class="add-process">
-            <h2>Add Process</h2>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="arrival-time">Arrival Time </label>
-                    <input class = " input-box" type="number" id="arrival-time" placeholder="Enter arrival time " min="0" max="100">
-                </div>
-                <div class="form-group">
-                    <label for="burst-time">Burst Time </label>
-                    <input class = " input-box" type="number" id="burst-time" placeholder="Enter burst time"  min="0" max="100">
-                </div>
-                <div class="form-group">
-                    <label for="priority">Priority</label>
-                    <input class = " input-box" type="number" id="priority" placeholder="Enter priority"  min="0" max="100">
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <select id="algorithm" >
-                    <option class = "opt" value="" >Select Algorithm</option>
-                    <option class = "opt" value="fcfs">First Come First Serve (FCFS)</option>
-                    <option class = "opt" value="sjf">Shortest Job First (SJF)</option>
-                    <option class = "opt" value="priority">Priority Scheduling</option>
-                    <option class = "opt" value="rr">Round Robin</option>
-                </select>
-                
-                <div id = "btn_area">
-                    <button class="add-btn" id="add-process"><i class="ri-add-large-line"></i> Add Process</button>
-                    <button class="run-btn" id="run-simulation"><i class="ri-play-large-line"></i>  Run Simulation</button>
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="display-section" id="process-queue">
-            <h2>Process Queue</h2>
-            <div id="empty-queue" class="empty-queue">No processes added yet. Add your first process above!</div>
-            <table id="process-table">
-                <thead>
-                    <tr>
-                        <th>PROCESS ID</th>
-                        <th>ARRIVAL TIME</th>
-                        <th>BURST TIME</th>
-                        <th>PRIORITY</th>
-                    </tr>
-                </thead>
-                <tbody id="process-table-body">
-                </tbody>
-            </table>
-        </div>
+        <div class="form-actions">
+          <select id="algorithm">
+            <option class="opt" value="">Select Algorithm</option>
+            <option class="opt" value="fcfs">
+              First Come First Serve (FCFS)
+            </option>
+            <option class="opt" value="sjf">Shortest Job First (SJF)</option>
+            <option class="opt" value="priority">Priority Scheduling</option>
+            <option class="opt" value="rr">Round Robin</option>
+          </select>
+          <input
+            type="number"
+            id="quantum"
+            placeholder="Time Quantum (for RR)"
+            class="p-2 border rounded w-full"
+            min="1"
+            value="2"
+            disabled
+          />
 
-        <div class="display-section" id="simulation-result">
-            <h2>Simulation Result</h2>
-            <div id="empty-queue" class="empty-queue">No results to diaplay.</div>
-            <div id="result">
-
-
-            </div>
-            
+          <div id="btn_area">
+            <button class="add-btn" id="add-process">
+              <i class="ri-add-large-line"></i> Add Process
+            </button>
+            <button class="run-btn" id="run-simulation">
+              <i class="ri-play-large-line"></i> Run Simulation
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div class="display-section" id="process-queue">
+        <h2>Process Queue</h2>
+        <div id="empty-queue" class="empty-queue">
+          No processes added yet. Add your first process above!
+        </div>
+        <table id="process-table">
+          <thead>
+            <tr>
+              <th>PROCESS ID</th>
+              <th>ARRIVAL TIME</th>
+              <th>BURST TIME</th>
+              <th>PRIORITY</th>
+            </tr>
+          </thead>
+          <tbody id="process-table-body"></tbody>
+        </table>
+      </div>
+
+      <div id="result" class="results-container">
+        <h2>Simulation Results</h2>
+        <div id="resultContent"></div>
+      </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const addProcessBtn = document.getElementById('add-process');
-            const processTableBody = document.getElementById('process-table-body');
-            const processTable = document.getElementById('process-table');
-            const emptyMessage = document.getElementById('empty-queue');
-            let processCount = 0;
-            
-            addProcessBtn.addEventListener('click', function() {
-                const arrivalTime = document.getElementById('arrival-time').value;
-                const burstTime = document.getElementById('burst-time').value;
-                const priority = document.getElementById('priority').value;
-                
-                // Validate inputs
-                if (!arrivalTime || !burstTime || priority === '') {
-                    alert('Please fill in all fields');
-                    return;
-                }
+      document.addEventListener("DOMContentLoaded", function () {
+        const addProcessBtn = document.getElementById("add-process");
+        const processTableBody = document.getElementById("process-table-body");
+        const processTable = document.getElementById("process-table");
+        const emptyMessage = document.getElementById("empty-queue");
+        let processCount = 0;
+        let runSimulationBtn = document.getElementById("run-simulation");
+        let processQueue = document.getElementById("process-queue");
+        let processes = [];
 
-                if (arrivalTime < 0 || burstTime < 1 || priority < 0) {
-                    alert('Please enter valid values (Arrival Time ≥ 0, Burst Time ≥ 1, Priority ≥ 0)');
-                    return;
-                }
+        document
+          .getElementById("algorithm")
+          .addEventListener("change", function () {
+            const quantumField = document.getElementById("quantum");
+            quantumField.disabled = this.value !== "RR";
+          });
 
-                const algorithm = document.getElementById('algorithm').value;
-                if (!algorithm) {
-                    alert('Please select an algorithm');
-                    return;
-                }
+        addProcessBtn.addEventListener("click", function () {
+          const arrivalTime = document.getElementById("arrival-time").value;
+          const burstTime = document.getElementById("burst-time").value;
+          const priority = document.getElementById("priority").value;
 
-                // Hide empty message and show table if first process
-                if (processCount === 0) {
-                    emptyMessage.style.display = 'none';
-                    processTable.style.display = 'table';
-                }
+          // Validate inputs
+          if (!arrivalTime || !burstTime || priority === "") {
+            alert("Please fill in all fields");
+            return;
+          }
 
-                // Increment process count and create ID
-                processCount++;
-                const processId = 'P' + processCount;
+          if (arrivalTime < 0 || burstTime < 1 || priority < 0) {
+            alert(
+              "Please enter valid values (Arrival Time ≥ 0, Burst Time ≥ 1, Priority ≥ 0)"
+            );
+            return;
+          }
 
-                // Create new table row
-                const newRow = document.createElement('tr');
-                
-                // Create and append table cells
-                const idCell = document.createElement('td');
-                idCell.textContent = processId;
-                newRow.appendChild(idCell);
-                
-                const arrivalCell = document.createElement('td');
-                arrivalCell.textContent = arrivalTime;
-                newRow.appendChild(arrivalCell);
-                
-                const burstCell = document.createElement('td');
-                burstCell.textContent = burstTime;
-                newRow.appendChild(burstCell);
-                
-                const priorityCell = document.createElement('td');
-                priorityCell.textContent = priority;
-                newRow.appendChild(priorityCell);
-                
-                // Add row to table
-                processTableBody.appendChild(newRow);
-                
-                // Clear the input fields
-                document.getElementById('arrival-time').value = '';
-                document.getElementById('burst-time').value = '';
-                document.getElementById('priority').value = '';
-            });
-            
-            runSimulationBtn.addEventListener('click', function() {
-                const algorithm = document.getElementById('algorithm').value;
-                if (!algorithm) {
-                    alert('Please select an algorithm');
-                    return;
-                }
-                
-                if (!processQueue.querySelector('.process')) {
-                    alert('Please add at least one process');
-                    return;
-                }
-                
-                alert(`Running simulation with ${algorithm} algorithm`);
-                // Here you would normally implement the actual simulation logic
-            });
+          const algorithm = document.getElementById("algorithm").value;
+          if (!algorithm) {
+            alert("Please select an algorithm");
+            return;
+          }
+
+          // Hide empty message and show table if first process
+          if (processCount === 0) {
+            emptyMessage.style.display = "none";
+            processTable.style.display = "table";
+          }
+
+          // Increment process count and create ID
+          processCount++;
+          const processId = "P" + processCount;
+          const process = {
+            pid: processId,
+            arrival_time: parseInt(arrivalTime),
+            burst_time: parseInt(burstTime),
+            priority: parseInt(priority),
+          };
+
+          processes.push(process);
+          // Create new table row
+          const newRow = document.createElement("tr");
+
+          // Create and append table cells
+          const idCell = document.createElement("td");
+          idCell.textContent = processId;
+          newRow.appendChild(idCell);
+
+          const arrivalCell = document.createElement("td");
+          arrivalCell.textContent = arrivalTime;
+          newRow.appendChild(arrivalCell);
+
+          const burstCell = document.createElement("td");
+          burstCell.textContent = burstTime;
+          newRow.appendChild(burstCell);
+
+          const priorityCell = document.createElement("td");
+          priorityCell.textContent = priority;
+          newRow.appendChild(priorityCell);
+
+          // Add row to table
+          processTableBody.appendChild(newRow);
+
+          // Clear the input fields
+          document.getElementById("arrival-time").value = "";
+          document.getElementById("burst-time").value = "";
+          document.getElementById("priority").value = "";
         });
+
+        runSimulationBtn.addEventListener("click", async function () {
+          const algorithm = document.getElementById("algorithm").value;
+          if (!algorithm) {
+            alert("Please select an algorithm");
+            return;
+          }
+
+          const tableRows = document.querySelectorAll("#process-table-body tr");
+          if (tableRows.length === 0) {
+            alert("Please add at least one process");
+            return;
+          }
+          const quantum =
+            parseInt(document.getElementById("quantum").value) || 0;
+
+          if (algorithm === "RR" && quantum <= 0) {
+            alert("Please enter a valid time quantum for Round Robin");
+            return;
+          }
+          alert(`Running simulation with ${algorithm} algorithm`);
+          // Here you would normally implement the actual simulation logic
+          const response = await fetch("http://127.0.0.1:5000/simulate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              algorithm: algorithm,
+              processes: processes,
+              quantum: 0,
+            }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Request failed");
+          }
+
+          const data = await response.json();
+          displayResults(data);
+        });
+      });
+      function displayResults(data) {
+        const container = document.getElementById("resultContent");
+
+        if (data.error) {
+          container.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+          return;
+        }
+
+        console.log(data);
+
+        let html = `
+    <div class="meta mb-4">
+      <p><strong>Algorithm:</strong> ${data.algorithm}</p>
+      ${
+        data.algorithm === "RR"
+          ? `<p><strong>Quantum:</strong> ${data.quantum || "N/A"}</p>`
+          : ""
+      }
+    </div>
+    <table class="min-w-full table-auto border border-gray-300">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="border px-4 py-2">PID</th>
+          <th class="border px-4 py-2">Arrival</th>
+          <th class="border px-4 py-2">Burst</th>
+          <th class="border px-4 py-2">Completion</th>
+          <th class="border px-4 py-2">Turnaround</th>
+          <th class="border px-4 py-2">Waiting</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+        data.results.forEach((proc) => {
+          const turnaround = proc.completion_time - proc.arrival_time;
+          const waiting = turnaround - proc.burst_time;
+          html += `
+          
+      <tr>
+        ${proc.pid}
+        ${proc.arrival_time}
+        ${proc.burst_time}
+        ${proc.completion_time}
+        ${proc.turnaround_time}
+        ${proc.waiting_time}
+      </tr>
+    `;
+        });
+
+        html += `
+      </tbody>
+    </table>
+  `;
+
+        container.innerHTML = html;
+      }
     </script>
-</body>
+  </body>
 </html>
