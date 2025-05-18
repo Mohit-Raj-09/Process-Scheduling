@@ -7,7 +7,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes
 
 @app.route('/')
 def serve_ui():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory('.', 'home.html')
 
 @app.route('/simulate', methods=['POST'])
 def simulate():
@@ -29,13 +29,13 @@ def simulate():
 
         proc_copy = [p.copy() for p in processes]
 
-        if algorithm == 'FCFS':
+        if algorithm == 'fcfs':
             result = fcfs(proc_copy)
-        elif algorithm == 'SJF':
+        elif algorithm == 'sjf':
             result = sjf(proc_copy)
-        elif algorithm == 'Priority':
+        elif algorithm == 'priority':
             result = priority_scheduling(proc_copy)
-        elif algorithm == 'RR':
+        elif algorithm == 'rr':
             result = round_robin(proc_copy, quantum)
         else:
             return jsonify({"error": "Invalid algorithm"}), 400
